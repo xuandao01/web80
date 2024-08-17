@@ -67,14 +67,12 @@ const userController = {
 
     forgetPassword: async (req, res) => {
         let {username} = req.body;
-        let id = req.params;
-        console.log(username);
-        let currentUser = await userModel.findById(id);
+        let currentUser = await userModel.findOne({username});
         if (!currentUser) {
             res.status(404).send('user ko ton tai');
         } else {
             let otp = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
-            let result = await userModel.findByIdAndUpdate(id,
+            let result = await userModel.findOneAndUpdate({username},
                 {
                     username: currentUser.username,
                     password: currentUser.password,
@@ -83,6 +81,42 @@ const userController = {
                 }
             )
             res.status(201).send(result);
+        }
+    },
+
+    resetPassword: async (req, res) => {
+        let {username, otp} = req.body;
+        let currentUser = await userModel.findOne({username});
+        console.log(currentUser);
+        if (!currentUser) {
+            res.status(404).send('user ko ton tai');
+        } else {
+            if (currentUser.otp == otp) {
+                if ((new Date() - currentUser.createdOtp < 300000)) {
+                    let password = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+                    let salt = bcrypt.genSaltSync();
+                    let hashedPassword = bcrypt.hashSync(password + '', salt);
+                    let result = await userModel.findOneAndUpdate({username},
+                        {
+                            username: currentUser.username,
+                            password: hashedPassword,
+                            otp,
+                            createdOtp: new Date()
+                        }
+                    )
+                    res.status(201).send({
+                        message: 'Success',
+                        data: {
+                            ...result,
+                            password: password
+                        }
+                    });
+                } else {
+                    res.status(400).send('otp da qua han');
+                }
+            } else {
+                res.status(400).send('otp khong dung');
+            }
         }
     }
 }
