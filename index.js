@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import userRouter from './Routes/userRouter.js';
 import commentRouter from './Routes/commentRouter.js';
 mongoose.connect('mongodb+srv://xuandao9876:xuandao9876@cluster.vua1f1n.mongodb.net/web80?retryWrites=true&w=majority');
-
+import userMiddleware from './Middleware/userMiddleware.js';
 const app = express();
 app.use(express.json());
 

@@ -17,7 +17,7 @@ const commentController = {
         let newComment = req.body;
         let commentId = req.params.id;
         // console.log(req.id, req.params);
-        let result = await commentModel.findByIdAndUpdate(commentId, newComment);
+        let result = await commentModel.findByIdAndUpdate(commentId, newComment);``
         res.status(201).send(result);
     },
 
